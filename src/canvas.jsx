@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { I18n } from 'react-redux-i18n';
 import Touches from 'touches';
 import { addWheelListener, removeWheelListener } from 'wheel';
 // import API from '@/services/api';
@@ -276,7 +275,7 @@ class Canvas extends Component {
 
   draw(props) {
     const { dom: { current: canvas }, origin, scale } = this;
-    const { name, peers, photos } = props || this.props;
+    const { peers, photos } = props || this.props;
     const ctx = canvas.getContext('2d');
     // Reset canvas context
     canvas.width = canvas.width;
@@ -286,12 +285,6 @@ class Canvas extends Component {
     ctx.scale(scale, scale);
     // Apply user translation
     ctx.translate(origin.x, origin.y);
-    // Draw room name at 0,0
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#999';
-    ctx.font = '32px Arial';
-    ctx.fillText(I18n.t(`Room.${name ? 'welcome' : 'joining'}`, { name }), 0, 0);
     // Go through all the photos in the redux state
     photos.forEach(({ _id, origin }) => {
       // Check the cache to see if the photo has been
@@ -336,7 +329,6 @@ class Canvas extends Component {
 
 Canvas.propTypes = {
   // eslint-disable-next-line react/no-unused-prop-types
-  name: PropTypes.string.isRequired,
   peers: PropTypes.arrayOf(PropTypes.shape({
     _id: PropTypes.string.isRequired,
     connection: PropTypes.object.isRequired,
