@@ -248,20 +248,7 @@ class Canvas extends Component {
     };
   }
 
-  loadPhotos({ peers, photos }) {
-    // Go through all the peers in the redux state
-    peers.forEach(({ _id }) => {
-      // If it's not already in the cache, load it as an Image object
-      if (!this.peers[_id]) {
-        const img = new Image();
-        // img.src = `${API.baseURL}user/${_id}/photo?auth=${API.token}`;
-        img.onload = () => (
-          // Redraw once it's loaded into the cache
-          this.draw()
-        );
-        this.peers[_id] = img;
-      }
-    });
+  loadPhotos({ photos }) {
     // Go through all the photos in the redux state
     photos.forEach(({ _id, photo }) => {
       // If it's not already in the cache, load it as an Image object
@@ -323,7 +310,6 @@ class Canvas extends Component {
         ctx.arc(x, y, radius * 0.9, 0, 2 * Math.PI);
         ctx.clip();
         // Draw the cached Image object
-        ctx.drawImage(this.peers[_id], x - radius, y - radius, radius * 2, radius * 2);
         ctx.restore();
       }
     });
