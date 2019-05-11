@@ -275,7 +275,7 @@ class Canvas extends Component {
 
   draw(props) {
     const { dom: { current: canvas }, origin, scale } = this;
-    const { name, peers, photos } = props || this.props;
+    const { peers, photos } = props || this.props;
     const ctx = canvas.getContext('2d');
     // Reset canvas context
     canvas.width = canvas.width;
@@ -329,7 +329,6 @@ class Canvas extends Component {
 
 Canvas.propTypes = {
   // eslint-disable-next-line react/no-unused-prop-types
-  name: PropTypes.string.isRequired,
   peers: PropTypes.arrayOf(PropTypes.shape({
     _id: PropTypes.string.isRequired,
     connection: PropTypes.object.isRequired,
