@@ -329,7 +329,6 @@ class Canvas extends Component {
 }
 
 Canvas.propTypes = {
-  // eslint-disable-next-line react/no-unused-prop-types
   peers: PropTypes.arrayOf(PropTypes.shape({
     _id: PropTypes.string.isRequired,
     connection: PropTypes.object.isRequired,
