@@ -22,9 +22,6 @@ class Canvas extends Component {
     this.origin = { x: 0, y: 0 };
     // This is what controls the viewport scaling
     this.scale = 1;
-    // The peer photos need to be downloaded from the API
-    // This is where we cache the loaded Image objects
-    this.peers = {};
     // The photos are stored in the state as a base64 string
     // We need to load the as Image objects in order to call ctx.drawImage
     // (and also to extract their width & height for intersection testing)
@@ -292,11 +289,9 @@ class Canvas extends Component {
       }
     });
     // Go through all the peers in the redux state
-    peers.forEach(({ _id, pointer }) => {
-      // Check the cache to see if the peer photo has been
-      // already loaded as an Image object by "loadPhotos"
-      // and if we have received a pointer position
-      if (this.peers[_id] && pointer) {
+    peers.forEach(({ pointer }) => {
+      // Check  if we have received a pointer position
+      if (pointer) {
         const [x, y] = pointer;
         // Scale size with viewport
         const radius = 24 / scale;
