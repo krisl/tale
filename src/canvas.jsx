@@ -341,7 +341,7 @@ Canvas.propTypes = {
     }),
     photo: PropTypes.string.isRequired,
   })).isRequired,
-  socket: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]).isRequired,
+  socket: PropTypes.shape({ send: PropTypes.func.isRequired }).isRequired,
 };
 
 export default Canvas
