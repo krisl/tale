@@ -168,13 +168,13 @@ class Canvas extends Component {
   onPointerMove(e, pointer) {
     const { dragging, origin, scale } = this;
     const { peers } = this.props;
-    const { x, y } = this.getPointer(pointer);
+    const scaledPointer = this.getPointer(pointer);
     peers.forEach(({ connection }) => {
       if (
         connection._channel
         && connection._channel.readyState === 'open'
       ) {
-        connection.send(new Int32Array([x, y]));
+        connection.send(new Int32Array([scaledPointer.x, scaledPointer.y]));
       }
     });
     if (!dragging) {
@@ -187,7 +187,7 @@ class Canvas extends Component {
       dragging.canvas = pointer;
     }
     if (dragging.photo) {
-      dragging.pointer = pointer;
+      dragging.scaledPointer = scaledPointer;
     }
     // Redraw
     this.draw();
@@ -294,9 +294,8 @@ class Canvas extends Component {
         const {dragging} = this
         if (dragging && dragging.photo && dragging.photo._id === _id) {
           // Translate the photo
-          const { offset, pointer } = dragging;
-          const { x, y } = this.getPointer(pointer);
-          ctx.drawImage(this.photos[_id], offset.x + x, offset.y + y);
+          const { offset, scaledPointer } = dragging;
+          ctx.drawImage(this.photos[_id], offset.x + scaledPointer.x, offset.y + scaledPointer.y);
         } else
           ctx.drawImage(this.photos[_id], origin.x, origin.y);
       }
