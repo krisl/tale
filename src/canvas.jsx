@@ -22,9 +22,6 @@ class Canvas extends Component {
     this.origin = { x: 0, y: 0 };
     // This is what controls the viewport scaling
     this.scale = 1;
-    // The peer photos need to be downloaded from the API
-    // This is where we cache the loaded Image objects
-    this.peers = {};
     // The photos are stored in the state as a base64 string
     // We need to load the as Image objects in order to call ctx.drawImage
     // (and also to extract their width & height for intersection testing)
@@ -248,20 +245,7 @@ class Canvas extends Component {
     };
   }
 
-  loadPhotos({ peers, photos }) {
-    // Go through all the peers in the redux state
-    peers.forEach(({ _id }) => {
-      // If it's not already in the cache, load it as an Image object
-      if (!this.peers[_id]) {
-        const img = new Image();
-        // img.src = `${API.baseURL}user/${_id}/photo?auth=${API.token}`;
-        img.onload = () => (
-          // Redraw once it's loaded into the cache
-          this.draw()
-        );
-        this.peers[_id] = img;
-      }
-    });
+  loadPhotos({ photos }) {
     // Go through all the photos in the redux state
     photos.forEach(({ _id, photo }) => {
       // If it's not already in the cache, load it as an Image object
@@ -305,11 +289,9 @@ class Canvas extends Component {
       }
     });
     // Go through all the peers in the redux state
-    peers.forEach(({ _id, pointer }) => {
-      // Check the cache to see if the peer photo has been
-      // already loaded as an Image object by "loadPhotos"
-      // and if we have received a pointer position
-      if (this.peers[_id] && pointer) {
+    peers.forEach(({ pointer }) => {
+      // Check  if we have received a pointer position
+      if (pointer) {
         const [x, y] = pointer;
         // Scale size with viewport
         const radius = 24 / scale;
@@ -323,7 +305,6 @@ class Canvas extends Component {
         ctx.arc(x, y, radius * 0.9, 0, 2 * Math.PI);
         ctx.clip();
         // Draw the cached Image object
-        ctx.drawImage(this.peers[_id], x - radius, y - radius, radius * 2, radius * 2);
         ctx.restore();
       }
     });
