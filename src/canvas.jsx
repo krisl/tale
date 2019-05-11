@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { I18n } from 'react-redux-i18n';
 import Touches from 'touches';
 import { addWheelListener, removeWheelListener } from 'wheel';
 // import API from '@/services/api';
@@ -286,12 +285,6 @@ class Canvas extends Component {
     ctx.scale(scale, scale);
     // Apply user translation
     ctx.translate(origin.x, origin.y);
-    // Draw room name at 0,0
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#999';
-    ctx.font = '32px Arial';
-    ctx.fillText(I18n.t(`Room.${name ? 'welcome' : 'joining'}`, { name }), 0, 0);
     // Go through all the photos in the redux state
     photos.forEach(({ _id, origin }) => {
       // Check the cache to see if the photo has been
