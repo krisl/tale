@@ -4,6 +4,13 @@ import Touches from 'touches';
 import { addWheelListener, removeWheelListener } from 'wheel';
 // import API from '@/services/api';
 
+const getOriginFromDragging = ({offset, scaledPointer}) => (
+  { 
+    x: offset.x + scaledPointer.x,
+    y: offset.y + scaledPointer.y
+  }
+)
+
 class Canvas extends Component {
   constructor(props) {
     super(props);
@@ -203,11 +210,11 @@ class Canvas extends Component {
     if (dragging.photo) {
       // Send the final translation to the server
       // So it gets saved into the db and broadcasted to the peers
-      const { _id: photo, origin } = dragging.photo;
+      const { _id: photo } = dragging.photo;
       socket.send(JSON.stringify({
         type: 'ROOM/MOVE_PHOTO',
         payload: {
-          origin,
+          origin: getOriginFromDragging(dragging),
           photo,
         },
       }));
@@ -290,14 +297,12 @@ class Canvas extends Component {
       // already loaded as an Image object by "loadPhotos"
       if (this.photos[_id]) {
         // Draw the cached Image object
-        console.log('drawphoto', origin.x, origin.y)
         const {dragging} = this
-        if (dragging && dragging.photo && dragging.photo._id === _id) {
-          // Translate the photo
-          const { offset, scaledPointer } = dragging;
-          ctx.drawImage(this.photos[_id], offset.x + scaledPointer.x, offset.y + scaledPointer.y);
-        } else
-          ctx.drawImage(this.photos[_id], origin.x, origin.y);
+        const {x, y} = (dragging && dragging.photo && dragging.photo._id === _id)
+          ? getOriginFromDragging(dragging)
+          : origin
+        console.log('drawphoto', x, y)
+        ctx.drawImage(this.photos[_id], x, y);
       }
     });
     // Go through all the peers in the redux state
