@@ -219,7 +219,6 @@ class Canvas extends Component {
         },
       }));
     }
-    this.draw()
   }
 
   onPointerWheel({ deltaY }) {
