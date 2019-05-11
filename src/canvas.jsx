@@ -277,7 +277,8 @@ class Canvas extends Component {
     const { dom: { current: canvas }, origin, scale } = this;
     const { peers, photos } = props || this.props;
     const ctx = canvas.getContext('2d');
-    // Reset canvas context
+    // Reset canvas context  TODO is this needed?
+    // eslint-disable-next-line no-self-assign
     canvas.width = canvas.width;
     // Room-space coordinates start at the middle of the canvas
     ctx.translate(canvas.width * 0.5, canvas.height * 0.5);
