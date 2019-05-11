@@ -22,6 +22,16 @@ const Room = () => {
           console.log({newphotos})
           setPhotos(newphotos)
         }
+        if (sent.type === 'ROOM/MOVE_PHOTO') {
+          console.log('moving', sent.payload)
+          const newphotos = photos.map(photo =>
+            photo._id === sent.payload.photo
+              ? Object.assign({}, photo, {origin: sent.payload.origin})
+              : photo
+          )
+          console.log({newphotos})
+          setPhotos(newphotos)
+        }
       }}} />
     </div>
   )
