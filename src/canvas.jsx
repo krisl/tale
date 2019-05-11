@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { I18n } from 'react-redux-i18n';
-import { connect } from 'react-redux';
 import Touches from 'touches';
 import { addWheelListener, removeWheelListener } from 'wheel';
 // import API from '@/services/api';
@@ -353,18 +352,4 @@ Canvas.propTypes = {
   socket: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]).isRequired,
 };
 
-export default connect(
-  ({
-    room: {
-      name,
-      peers,
-      photos,
-      socket,
-    },
-  }) => ({
-    name,
-    peers,
-    photos,
-    socket,
-  })
-)(Canvas);
+export default Canvas
