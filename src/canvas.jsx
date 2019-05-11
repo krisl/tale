@@ -58,7 +58,7 @@ class Canvas extends Component {
     const { dom: { current: canvas }, touches } = this;
     // We're unloading the room
     // Unbind all event handlers
-    // touches.disable();
+    touches.disable();
     canvas.removeEventListener('dragover', Canvas.onDragOver);
     canvas.removeEventListener('drop', this.onDrop);
     removeWheelListener(window, this.onPointerWheel);
@@ -167,7 +167,7 @@ class Canvas extends Component {
 
   onPointerMove(e, pointer) {
     const { dragging, origin, scale } = this;
-    const { peers = [] } = this.props;
+    const { peers } = this.props;
     const { x, y } = this.getPointer(pointer);
     peers.forEach(({ connection }) => {
       if (
@@ -244,7 +244,7 @@ class Canvas extends Component {
     };
   }
 
-  loadPhotos({ peers = [], photos }) {
+  loadPhotos({ peers, photos }) {
     // Go through all the peers in the redux state
     peers.forEach(({ _id }) => {
       // If it's not already in the cache, load it as an Image object
@@ -275,7 +275,7 @@ class Canvas extends Component {
 
   draw(props) {
     const { dom: { current: canvas }, origin, scale } = this;
-    const { name, peers = [], photos } = props || this.props;
+    const { name, peers, photos } = props || this.props;
     const ctx = canvas.getContext('2d');
     // Reset canvas context
     canvas.width = canvas.width;
