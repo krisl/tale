@@ -16,6 +16,12 @@ const Room = () => {
           console.log({newphotos})
           setPhotos(newphotos)
         }
+        if (sent.type === 'ROOM/REMOVE_PHOTO') {
+          console.log('removing', sent.payload)
+          const newphotos = photos.filter(photo => photo._id !== sent.payload.photo)
+          console.log({newphotos})
+          setPhotos(newphotos)
+        }
       }}} />
     </div>
   )
