@@ -187,10 +187,7 @@ class Canvas extends Component {
       dragging.canvas = pointer;
     }
     if (dragging.photo) {
-      // Translate the photo
-      const { offset, photo } = dragging;
-      photo.origin.x = x + offset.x;
-      photo.origin.y = y + offset.y;
+      dragging.pointer = pointer;
     }
     // Redraw
     this.draw();
@@ -215,6 +212,7 @@ class Canvas extends Component {
         },
       }));
     }
+    this.draw()
   }
 
   onPointerWheel({ deltaY }) {
@@ -292,7 +290,15 @@ class Canvas extends Component {
       // already loaded as an Image object by "loadPhotos"
       if (this.photos[_id]) {
         // Draw the cached Image object
-        ctx.drawImage(this.photos[_id], origin.x, origin.y);
+        console.log('drawphoto', origin.x, origin.y)
+        const {dragging} = this
+        if (dragging && dragging.photo && dragging.photo._id === _id) {
+          // Translate the photo
+          const { offset, pointer } = dragging;
+          const { x, y } = this.getPointer(pointer);
+          ctx.drawImage(this.photos[_id], offset.x + x, offset.y + y);
+        } else
+          ctx.drawImage(this.photos[_id], origin.x, origin.y);
       }
     });
     // Go through all the peers in the redux state
