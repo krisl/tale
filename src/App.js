@@ -1,9 +1,95 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Peer from 'peerjs';
 import Canvas from './canvas';
 import './App.css';
 
+const getPeerId = () => {
+  const hash = window.location.hash
+  if (hash && typeof hash === 'string')
+    return hash.replace(/\W/g, '')
+}
+
+const listenForPeer = (session) => {
+  session.on('connection', connection => {
+    if (connection.label === 'FILE') {
+      console.log('incomming file connection');
+      // setAppState(s => ({...s, state: 'transferring'}))
+      connection.on('open', (x) => {
+        console.log('incomming file connection open', connection)
+        // connection.send({file, name: file.name, size: file.size, type: file.type})
+      })
+    }
+
+    if (connection.label === 'DATA') {
+      console.log('incomming data connection');
+      connection.on('open', () => {
+        console.log('incomming data connection open', connection)
+        connection.send({name: 'bobx'})
+      })
+    }
+  })
+}
+
 const Room = () => { 
   const [photos, setPhotos] = useState([])
+  const [appState, setAppState] = useState({state: 'registering'})
+  console.log('appState', appState.state)
+
+  useEffect(
+    () => {
+      const session = new Peer(undefined, {debug: 3})
+      console.log({session})
+      session.on('open', id => {
+        console.log({id})
+        console.log(`${document.URL}#${id}`)
+        const peerId = getPeerId()
+        setAppState({
+          state: peerId ? 'connectingToHost' : 'waitingForClientConnections',
+          id, session
+        })
+
+        if (!peerId)
+          listenForPeer(session)
+
+        if (peerId) {
+          console.log('need to connect to ' + peerId)
+
+          const connectToHost = peerId => {
+            // make a file and data connection
+            const file = session.connect(peerId, {label: 'FILE', reliable: true})
+            const data = session.connect(peerId, {label: 'DATA'})
+            setAppState(s => ({...s, state: 'waitingForOpen'}))
+
+            file.on('open', (o) => {
+              console.log('file connection open', o);
+              setAppState(s => ({
+                ...s,
+                state: s.state === 'waitingForOpen' ? 'waitingForOpen2' : 'open'
+              }))
+              file.on('data', (d) => {
+                console.log('fdata', {d})
+              })
+            })
+
+            data.on('open', (o) => {
+              console.log('data connection open', o);
+              setAppState(s => ({
+                ...s,
+                state: s.state === 'waitingForOpen' ? 'waitingForOpen2' : 'open'
+              }))
+              data.on('data', (d) => console.log('ddata', {d}))
+            })
+
+            file.on('error', e => console.log('file error', e))
+            data.on('error', e => console.log('data error', e))
+          }
+
+          connectToHost(peerId)
+        }
+      })
+    },
+    []
+  )
   return (
     <div>
       <Canvas peers={[]} photos={photos} socket={{send: sent => {
