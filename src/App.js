@@ -66,6 +66,8 @@ const Room = () => {
             // make a file and data connection
             const file = session.connect(peerId, {label: 'FILE', reliable: true})
             const data = session.connect(peerId, {label: 'DATA'})
+            setPeers(buildPeerConnection('file', file))
+            setPeers(buildPeerConnection('data', data))
             setAppState(s => ({...s, state: 'waitingForOpen'}))
 
             file.on('open', (o) => {
@@ -85,7 +87,16 @@ const Room = () => {
                 ...s,
                 state: s.state === 'waitingForOpen' ? 'waitingForOpen2' : 'open'
               }))
-              data.on('data', (d) => console.log('ddata', {d}))
+              data.on('data', (d) => {
+                console.log('ddata', {d})
+                setPeers(peers => ({
+                  ...peers,
+                  [peerId]: {
+                    ...peers[peerId],
+                    pointer: [...(new Int32Array(d))]
+                  }
+                }))
+              })
             })
 
             file.on('error', e => console.log('file error', e))
