@@ -55,6 +55,36 @@ const Room = () => {
   console.log('appState', appState.state)
   console.log('peers', peers)
 
+  const reduce = sent => {
+    if (sent.type === 'ROOM/ADD_PHOTO') {
+      sent.payload._id = Math.random().toString(36).substr(2, 5)
+      console.log('adding', sent.payload)
+      const newphotos = [sent.payload, ...photos]
+      console.log({newphotos})
+      setPhotos(newphotos)
+      Object.values(peers).forEach(({ file: connection }) => {
+        if (connection.open) 
+          connection.send(sent.payload)
+      })
+    }
+    if (sent.type === 'ROOM/REMOVE_PHOTO') {
+      console.log('removing', sent.payload)
+      const newphotos = photos.filter(photo => photo._id !== sent.payload.photo)
+      console.log({newphotos})
+      setPhotos(newphotos)
+    }
+    if (sent.type === 'ROOM/MOVE_PHOTO') {
+      console.log('moving', sent.payload)
+      const newphotos = photos.map(photo =>
+        photo._id === sent.payload.photo
+          ? Object.assign({}, photo, {origin: sent.payload.origin})
+          : photo
+      )
+      console.log({newphotos})
+      setPhotos(newphotos)
+    }
+  }
+
   useEffect(
     () => {
       const session = new Peer(undefined, {debug: 3})
@@ -113,38 +143,13 @@ const Room = () => {
     },
     []
   )
+
   return (
     <div>
       <Canvas peers={Object.values(peers)} photos={photos} socket={{send: sent => {
         sent = JSON.parse(sent)
         console.log({sent})
-        if (sent.type === 'ROOM/ADD_PHOTO') {
-          sent.payload._id = Math.random().toString(36).substr(2, 5)
-          console.log('adding', sent.payload)
-          const newphotos = [sent.payload, ...photos]
-          console.log({newphotos})
-          setPhotos(newphotos)
-          Object.values(peers).forEach(({ file: connection }) => {
-            if (connection.open) 
-              connection.send(sent.payload)
-          })
-        }
-        if (sent.type === 'ROOM/REMOVE_PHOTO') {
-          console.log('removing', sent.payload)
-          const newphotos = photos.filter(photo => photo._id !== sent.payload.photo)
-          console.log({newphotos})
-          setPhotos(newphotos)
-        }
-        if (sent.type === 'ROOM/MOVE_PHOTO') {
-          console.log('moving', sent.payload)
-          const newphotos = photos.map(photo =>
-            photo._id === sent.payload.photo
-              ? Object.assign({}, photo, {origin: sent.payload.origin})
-              : photo
-          )
-          console.log({newphotos})
-          setPhotos(newphotos)
-        }
+        reduce(sent)
       }}} />
     </div>
   )
