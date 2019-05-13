@@ -24,7 +24,7 @@ const onData = (data, setPeers, peerId) =>
 const buildPeerConnection = (type, connection) =>
   p => ({...p, [connection.peer]: {...(p[connection.peer] || {}), [type]: connection}})
 
-const listenForPeer = (session, setPeers) => {
+const listenForPeer = (session, setPeers, reduce) => {
   session.on('connection', connection => {
     if (connection.label === 'FILE') {
       console.log('incomming file connection');
@@ -32,6 +32,10 @@ const listenForPeer = (session, setPeers) => {
       connection.on('open', (x) => {
         console.log('incomming file connection open', connection)
         // connection.send({file, name: file.name, size: file.size, type: file.type})
+        connection.on('data', (d) => {
+          console.log('fdata', {d})
+          reduce(d)
+        })
       })
 
       setPeers(buildPeerConnection('file', connection))
@@ -88,7 +92,7 @@ const Room = () => {
         })
 
         if (!peerId)
-          listenForPeer(session, setPeers)
+          listenForPeer(session, setPeers, reduce)
 
         if (peerId) {
           console.log('need to connect to ' + peerId)
