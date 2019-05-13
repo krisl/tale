@@ -175,7 +175,7 @@ class Canvas extends Component {
     const scaledPointer = this.getPointer(pointer);
     peers.forEach(({ data: connection }) => {
       if ( connection.open ) {
-        console.log('sending...')
+        // console.log('sending...')
         connection.send(new Int32Array([scaledPointer.x, scaledPointer.y]));
       }
     });
@@ -282,7 +282,7 @@ class Canvas extends Component {
         const {x, y} = (dragging && dragging.photo && dragging.photo._id === _id)
           ? getOriginFromDragging(dragging)
           : origin
-        console.log('drawphoto', x, y)
+        // console.log('drawphoto', x, y)
         ctx.drawImage(this.photos[_id], x, y);
       }
     });

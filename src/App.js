@@ -11,7 +11,7 @@ const getPeerId = () => {
 
 const onData = (data, setPeers, peerId) =>
   data.on('data', (d) => {
-    console.log('ddata', {d})
+    // console.log('ddata', {d})
     setPeers(peers => ({
       ...peers,
       [peerId]: {
