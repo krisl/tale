@@ -9,6 +9,18 @@ const getPeerId = () => {
     return hash.replace(/\W/g, '')
 }
 
+const onData = (data, setPeers, peerId) =>
+  data.on('data', (d) => {
+    console.log('ddata', {d})
+    setPeers(peers => ({
+      ...peers,
+      [peerId]: {
+        ...peers[peerId],
+        pointer: [...(new Int32Array(d))]
+      }
+    }))
+  })
+
 const buildPeerConnection = (type, connection) =>
   p => ({...p, [connection.peer]: {...(p[connection.peer] || {}), [type]: connection}})
 
@@ -29,7 +41,7 @@ const listenForPeer = (session, setPeers) => {
       console.log('incomming data connection');
       connection.on('open', () => {
         console.log('incomming data connection open', connection)
-        connection.send({name: 'bobx'})
+        onData(connection, setPeers, connection.peer)
       })
       setPeers(buildPeerConnection('data', connection))
     }
@@ -87,16 +99,7 @@ const Room = () => {
                 ...s,
                 state: s.state === 'waitingForOpen' ? 'waitingForOpen2' : 'open'
               }))
-              data.on('data', (d) => {
-                console.log('ddata', {d})
-                setPeers(peers => ({
-                  ...peers,
-                  [peerId]: {
-                    ...peers[peerId],
-                    pointer: [...(new Int32Array(d))]
-                  }
-                }))
-              })
+              onData(data, setPeers, peerId)
             })
 
             file.on('error', e => console.log('file error', e))
