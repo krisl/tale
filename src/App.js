@@ -9,7 +9,10 @@ const getPeerId = () => {
     return hash.replace(/\W/g, '')
 }
 
-const listenForPeer = (session) => {
+const buildPeerConnection = (type, connection) =>
+  p => ({...p, [connection.peer]: {...(p[connection.peer] || {}), [type]: connection}})
+
+const listenForPeer = (session, setPeers) => {
   session.on('connection', connection => {
     if (connection.label === 'FILE') {
       console.log('incomming file connection');
@@ -18,6 +21,8 @@ const listenForPeer = (session) => {
         console.log('incomming file connection open', connection)
         // connection.send({file, name: file.name, size: file.size, type: file.type})
       })
+
+      setPeers(buildPeerConnection('file', connection))
     }
 
     if (connection.label === 'DATA') {
@@ -26,6 +31,7 @@ const listenForPeer = (session) => {
         console.log('incomming data connection open', connection)
         connection.send({name: 'bobx'})
       })
+      setPeers(buildPeerConnection('data', connection))
     }
   })
 }
@@ -33,7 +39,9 @@ const listenForPeer = (session) => {
 const Room = () => { 
   const [photos, setPhotos] = useState([])
   const [appState, setAppState] = useState({state: 'registering'})
+  const [peers, setPeers] = useState({})
   console.log('appState', appState.state)
+  console.log('peers', peers)
 
   useEffect(
     () => {
@@ -49,7 +57,7 @@ const Room = () => {
         })
 
         if (!peerId)
-          listenForPeer(session)
+          listenForPeer(session, setPeers)
 
         if (peerId) {
           console.log('need to connect to ' + peerId)
@@ -92,7 +100,7 @@ const Room = () => {
   )
   return (
     <div>
-      <Canvas peers={[]} photos={photos} socket={{send: sent => {
+      <Canvas peers={Object.values(peers)} photos={photos} socket={{send: sent => {
         sent = JSON.parse(sent)
         console.log({sent})
         if (sent.type === 'ROOM/ADD_PHOTO') {
