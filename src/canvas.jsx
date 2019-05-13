@@ -95,6 +95,7 @@ class Canvas extends Component {
       socket.send(JSON.stringify({
         type: 'ROOM/ADD_PHOTO',
         payload: {
+          _id: Math.random().toString(36).substr(2, 5),
           origin,
           photo: reader.result.substr(reader.result.indexOf('base64') + 7),
         },

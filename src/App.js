@@ -57,7 +57,6 @@ const Room = () => {
 
   const reduce = sent => {
     if (sent.type === 'ROOM/ADD_PHOTO') {
-      sent.payload._id = sent.payload._id || Math.random().toString(36).substr(2, 5)
       console.log('adding', sent.payload)
       setPhotos(photos => [sent.payload, ...photos])
     }
