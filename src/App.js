@@ -90,6 +90,7 @@ const Room = () => {
               }))
               file.on('data', (d) => {
                 console.log('fdata', {d})
+                setPhotos(photos => [d, ...photos])
               })
             })
 
@@ -123,6 +124,10 @@ const Room = () => {
           const newphotos = [sent.payload, ...photos]
           console.log({newphotos})
           setPhotos(newphotos)
+          Object.values(peers).forEach(({ file: connection }) => {
+            if (connection.open) 
+              connection.send(sent.payload)
+          })
         }
         if (sent.type === 'ROOM/REMOVE_PHOTO') {
           console.log('removing', sent.payload)
