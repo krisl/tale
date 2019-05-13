@@ -250,11 +250,11 @@ class Canvas extends Component {
       if (!this.photos[_id]) {
         const img = new Image();
         img.src = `data:image/jpeg;base64,${photo}`;
-        img.onload = () => (
+        img.onload = () => {
           // Redraw once it's loaded into the cache
+          this.photos[_id] = img;
           this.draw()
-        );
-        this.photos[_id] = img;
+        }
       }
     });
   }
