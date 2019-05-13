@@ -57,31 +57,21 @@ const Room = () => {
 
   const reduce = sent => {
     if (sent.type === 'ROOM/ADD_PHOTO') {
-      sent.payload._id = Math.random().toString(36).substr(2, 5)
+      sent.payload._id = sent.payload._id || Math.random().toString(36).substr(2, 5)
       console.log('adding', sent.payload)
-      const newphotos = [sent.payload, ...photos]
-      console.log({newphotos})
-      setPhotos(newphotos)
-      Object.values(peers).forEach(({ file: connection }) => {
-        if (connection.open) 
-          connection.send(sent.payload)
-      })
+      setPhotos(photos => [sent.payload, ...photos])
     }
     if (sent.type === 'ROOM/REMOVE_PHOTO') {
       console.log('removing', sent.payload)
-      const newphotos = photos.filter(photo => photo._id !== sent.payload.photo)
-      console.log({newphotos})
-      setPhotos(newphotos)
+      setPhotos(photos => photos.filter(photo => photo._id !== sent.payload.photo))
     }
     if (sent.type === 'ROOM/MOVE_PHOTO') {
       console.log('moving', sent.payload)
-      const newphotos = photos.map(photo =>
+      setPhotos(photos => photos.map(photo =>
         photo._id === sent.payload.photo
           ? Object.assign({}, photo, {origin: sent.payload.origin})
           : photo
-      )
-      console.log({newphotos})
-      setPhotos(newphotos)
+      ))
     }
   }
 
@@ -120,7 +110,7 @@ const Room = () => {
               }))
               file.on('data', (d) => {
                 console.log('fdata', {d})
-                setPhotos(photos => [d, ...photos])
+                reduce(d)
               })
             })
 
@@ -150,6 +140,10 @@ const Room = () => {
         sent = JSON.parse(sent)
         console.log({sent})
         reduce(sent)
+        Object.values(peers).forEach(({ file: connection }) => {
+          if (connection.open) 
+            connection.send(sent)
+        })
       }}} />
     </div>
   )
