@@ -3,11 +3,13 @@ import Peer from 'peerjs';
 import Canvas from './canvas';
 import './App.css';
 
-const getPeerId = () => {
+const getHash = () => {
   const hash = window.location.hash
   if (hash && typeof hash === 'string')
     return hash.replace(/\W/g, '')
 }
+
+const getPeerId = getHash
 
 const onData = (data, setPeers, peerId) =>
   data.on('data', (d) => {
