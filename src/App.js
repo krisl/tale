@@ -107,35 +107,43 @@ const Room = () => {
 
           const connectToHost = peerId => {
             // make a file and data connection
-            const file = session.connect(peerId, {label: 'FILE', reliable: true})
-            const data = session.connect(peerId, {label: 'DATA'})
-            setPeers(buildPeerConnection('file', file))
-            setPeers(buildPeerConnection('data', data))
-            setAppState(s => ({...s, state: 'waitingForOpen'}))
+            const makeFileConnection = () => {
+              const file = session.connect(peerId, {label: 'FILE', reliable: true})
+              setPeers(buildPeerConnection('file', file))
+              setAppState(s => ({...s, state: 'waitingForOpen'}))
 
-            file.on('open', (o) => {
-              console.log('file connection open', o);
-              setAppState(s => ({
-                ...s,
-                state: s.state === 'waitingForOpen' ? 'waitingForOpen2' : 'open'
-              }))
-              file.on('data', (d) => {
-                console.log('fdata', {d})
-                reduce(d)
+              file.on('open', (o) => {
+                console.log('file connection open', o);
+                setAppState(s => ({
+                  ...s,
+                  state: s.state === 'waitingForOpen' ? 'waitingForOpen2' : 'open'
+                }))
+                file.on('data', (d) => {
+                  console.log('fdata', {d})
+                  reduce(d)
+                })
               })
-            })
 
-            data.on('open', (o) => {
-              console.log('data connection open', o);
-              setAppState(s => ({
-                ...s,
-                state: s.state === 'waitingForOpen' ? 'waitingForOpen2' : 'open'
-              }))
-              onData(data, setPeers, peerId)
-            })
+              file.on('error', e => console.log('file error', e))
+            }
 
-            file.on('error', e => console.log('file error', e))
-            data.on('error', e => console.log('data error', e))
+            const makeDataConnection = () => {
+              const data = session.connect(peerId, {label: 'DATA'})
+              setPeers(buildPeerConnection('data', data))
+              data.on('open', (o) => {
+                console.log('data connection open', o);
+                setAppState(s => ({
+                  ...s,
+                  state: s.state === 'waitingForOpen' ? 'waitingForOpen2' : 'open'
+                }))
+                onData(data, setPeers, peerId)
+              })
+
+              data.on('error', e => console.log('data error', e))
+            }
+
+            makeFileConnection()
+            makeDataConnection()
           }
 
           connectToHost(peerId)
