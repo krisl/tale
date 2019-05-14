@@ -30,7 +30,7 @@ const onData = (data, setPeers, peerId) =>
 const buildPeerConnection = (type, connection) =>
   p => ({...p, [connection.peer]: {...(p[connection.peer] || {}), [type]: connection}})
 
-const listenForPeer = (session, setPeers, reduce) => {
+const listenForPeer = (session, setPeers, reduce, setPhotos) => {
   session.on('connection', connection => {
     if (connection.label === 'FILE') {
       console.log('incomming file connection');
@@ -38,6 +38,23 @@ const listenForPeer = (session, setPeers, reduce) => {
       connection.on('open', (x) => {
         console.log('incomming file connection open', connection)
         // connection.send({file, name: file.name, size: file.size, type: file.type})
+        // FIXME doesnt actually setPeers, just send each one all the photos
+        setPhotos(photos => {
+          photos.forEach(photo =>
+            setPeers(peers => {
+              Object.values(peers).forEach(({ file: connection }) => {
+                if (connection.open) {
+                  connection.send({
+                    type: 'ROOM/ADD_PHOTO',
+                    payload: photo
+                  })
+                }
+              })
+              return peers
+            })
+          )
+          return photos
+        })
         connection.on('data', (d) => {
           console.log('fdata', {d})
           reduce(d)
@@ -100,7 +117,7 @@ const Room = () => {
         })
 
         if (!peerId)
-          listenForPeer(session, setPeers, reduce)
+          listenForPeer(session, setPeers, reduce, setPhotos)
 
         if (peerId) {
           console.log('need to connect to ' + peerId)
