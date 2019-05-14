@@ -92,16 +92,37 @@ class Canvas extends Component {
     const origin = this.getPointer([clientX, clientY]);
     // Read the file
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = (eReader) => {
       // Once it loads, send it to the room server:
-      socket.send(JSON.stringify({
-        type: 'ROOM/ADD_PHOTO',
-        payload: {
-          _id: Math.random().toString(36).substr(2, 5),
-          origin,
-          photo: reader.result.substr(reader.result.indexOf('base64') + 7),
-        },
-      }));
+      const i = new Image()
+      i.src = eReader.target.result
+      i.onload = function(ie) {
+        const c = document.createElement('canvas')
+        c.width = i.width
+        c.height = i.height
+        c.getContext('2d').drawImage(i, 0, 0)
+        const data = c.toDataURL('image/jpeg', 0.01)
+        console.log('small', data.length)
+        console.log('big', reader.result.length)
+        const _id = Math.random().toString(36).substr(2, 5)
+        socket.send(JSON.stringify({
+          type: 'ROOM/ADD_PHOTO',
+          payload: {
+            _id, 
+            origin,
+            photo: data.substr(data.indexOf('base64') + 7),
+          },
+        }));
+        socket.send(JSON.stringify({
+          type: 'ROOM/ADD_PHOTO',
+          payload: {
+            _oldid: _id,
+            _id: Math.random().toString(36).substr(2, 5),
+            origin,
+            photo: reader.result.substr(reader.result.indexOf('base64') + 7),
+          },
+        }));
+      }
     };
     reader.readAsDataURL(file);
   }
