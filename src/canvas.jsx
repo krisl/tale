@@ -203,7 +203,8 @@ class Canvas extends Component {
       return;
     }
     delete this.dragging;
-    if (dragging.photo) {
+    // we only have a scaledPointer if we have moved the image
+    if (dragging.photo && dragging.scaledPointer) {
       // Send the final translation to the server
       // So it gets saved into the db and broadcasted to the peers
       const { _id: photo } = dragging.photo;
