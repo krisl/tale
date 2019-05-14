@@ -69,7 +69,7 @@ const Room = () => {
   const reduce = sent => {
     if (sent.type === 'ROOM/ADD_PHOTO') {
       console.log('adding', sent.payload)
-      setPhotos(photos => [sent.payload, ...photos])
+      setPhotos(photos => [sent.payload, ...photos.filter(photo => photo._id !== sent.payload._oldid)])
     }
     if (sent.type === 'ROOM/REMOVE_PHOTO') {
       console.log('removing', sent.payload)
