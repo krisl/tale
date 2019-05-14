@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/tale/static/css/main.476911b1.chunk.css",
-    "main.js": "/tale/static/js/main.abc3877c.chunk.js",
-    "main.js.map": "/tale/static/js/main.abc3877c.chunk.js.map",
+    "main.js": "/tale/static/js/main.18f8ba88.chunk.js",
+    "main.js.map": "/tale/static/js/main.18f8ba88.chunk.js.map",
     "runtime~main.js": "/tale/static/js/runtime~main.4bf973ca.js",
     "runtime~main.js.map": "/tale/static/js/runtime~main.4bf973ca.js.map",
     "static/js/2.12a5bd00.chunk.js": "/tale/static/js/2.12a5bd00.chunk.js",
     "static/js/2.12a5bd00.chunk.js.map": "/tale/static/js/2.12a5bd00.chunk.js.map",
     "index.html": "/tale/index.html",
-    "precache-manifest.96be7c27bc6f7ad9a07d0327544a8f2f.js": "/tale/precache-manifest.96be7c27bc6f7ad9a07d0327544a8f2f.js",
+    "precache-manifest.691018e549433921bebb3d43bcbbefd5.js": "/tale/precache-manifest.691018e549433921bebb3d43bcbbefd5.js",
     "service-worker.js": "/tale/service-worker.js",
     "static/css/main.476911b1.chunk.css.map": "/tale/static/css/main.476911b1.chunk.css.map"
   }
