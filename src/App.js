@@ -9,7 +9,11 @@ const getHash = () => {
     return hash.replace(/\W/g, '')
 }
 
-const getPeerId = getHash
+const getQuery = () => {
+  return new URLSearchParams(window.location.search).get('h')
+}
+
+const getPeerId = getQuery
 
 const onData = (data, setPeers, peerId) =>
   data.on('data', (d) => {
@@ -82,11 +86,12 @@ const Room = () => {
 
   useEffect(
     () => {
-      const session = new Peer(undefined, {debug: 3})
+      const session = new Peer(getHash(), {debug: 3})
       console.log({session})
       session.on('open', id => {
         console.log({id})
-        console.log(`${document.URL}#${id}`)
+        console.log(`${document.URL}?h=${id}`)
+        window.location.hash = id
         const peerId = getPeerId()
         setAppState({
           state: peerId ? 'connectingToHost' : 'waitingForClientConnections',
