@@ -177,7 +177,7 @@ class Canvas extends Component {
     const { peers } = this.props;
     const scaledPointer = this.getPointer(pointer);
     peers.forEach(({ data: connection }) => {
-      if ( connection.open ) {
+      if ( connection && connection.open ) {
         // console.log('sending...')
         connection.send(new Int32Array([scaledPointer.x, scaledPointer.y]));
       }
