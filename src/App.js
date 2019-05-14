@@ -61,6 +61,7 @@ const listenForPeer = (session, setPeers, reduce) => {
 const Room = () => { 
   const [photos, setPhotos] = useState([])
   const [appState, setAppState] = useState({state: 'registering'})
+  // TODO let the connection manage its own peers
   const [peers, setPeers] = useState({})
   console.log('appState', appState.state)
   console.log('peers', peers)
