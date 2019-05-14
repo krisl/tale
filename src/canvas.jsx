@@ -33,6 +33,8 @@ class Canvas extends Component {
     const { dom: { current: canvas } } = this;
     // Load the inital set of photos
     this.loadPhotos(this.props);
+    this.remotePointerImage = new Image()
+    this.remotePointerImage.src = 'https://togetherjs.com/togetherjs/images/cursor.svg'
     // Bind the events
     canvas.addEventListener('dragover', Canvas.onDragOver, false);
     canvas.addEventListener('drop', this.onDrop, false);
@@ -294,17 +296,9 @@ class Canvas extends Component {
       if (pointer) {
         const [x, y] = pointer;
         // Scale size with viewport
-        const radius = 24 / scale;
-        // Draw outer circle
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, 2 * Math.PI);
-        ctx.fill();
-        // Clipping mask circle
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(x, y, radius * 0.9, 0, 2 * Math.PI);
-        ctx.clip();
+        // TODO use scale
         // Draw the cached Image object
+        ctx.drawImage(this.remotePointerImage, x, y);
         ctx.restore();
       }
     });
