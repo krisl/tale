@@ -125,6 +125,10 @@ const Room = () => {
               })
 
               file.on('error', e => console.log('file error', e))
+              file.on('close', (x) => {
+                console.log('file reconnecting...', x)
+                makeFileConnection()
+              })
             }
 
             const makeDataConnection = () => {
@@ -140,6 +144,11 @@ const Room = () => {
               })
 
               data.on('error', e => console.log('data error', e))
+
+              data.on('close', (x) => {
+                console.log('data reconnecting...', x)
+                makeDataConnection()
+              })
             }
 
             makeFileConnection()
