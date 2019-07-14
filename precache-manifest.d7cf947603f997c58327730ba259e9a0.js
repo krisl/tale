@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "0ef180a08388ccbb920f5d8617c8b0c0",
+    "revision": "f125dfe84e170143358c97a4d4cd7722",
     "url": "/tale/index.html"
   },
   {
@@ -8,8 +8,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/tale/static/css/main.476911b1.chunk.css"
   },
   {
-    "revision": "a0e195b03cdfde3418a4",
-    "url": "/tale/static/js/2.12a5bd00.chunk.js"
+    "revision": "e057c35d800ef2253b36",
+    "url": "/tale/static/js/2.8683a914.chunk.js"
   },
   {
     "revision": "d024db38620ec7024ebf",
