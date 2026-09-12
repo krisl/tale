@@ -15,6 +15,36 @@ const getQuery = () => {
 
 const getPeerId = getQuery
 
+const buildInviteUrl = (id) => {
+  if (!id) return ''
+  const { origin, pathname } = window.location
+  return `${origin}${pathname}?h=${id}`
+}
+
+const humanizeState = (state) => {
+  switch (state) {
+    case 'registering':
+      return { label: 'Starting…', hint: 'Registering with the signalling server.' }
+    case 'waitingForClientConnections':
+      return { label: 'Waiting for guests', hint: 'Share your invite link — you are the host.' }
+    case 'connectingToHost':
+      return { label: 'Connecting to host…', hint: 'Opening peer-to-peer channels.' }
+    case 'waitingForOpen':
+      return { label: 'Opening channels…', hint: 'Waiting for the first connection to open (1 of 2).' }
+    case 'waitingForOpen2':
+      return { label: 'Almost there…', hint: 'Waiting for the second connection to open (2 of 2).' }
+    case 'open':
+      return { label: 'Connected', hint: 'Live. Photos and cursors sync peer-to-peer.' }
+    default:
+      return { label: state || 'Unknown', hint: '' }
+  }
+}
+
+const countLivePeers = (peers) =>
+  Object.values(peers).filter(
+    ({ file, data }) => (file && file.open) || (data && data.open)
+  ).length
+
 const onData = (data, setPeers, peerId) =>
   data.on('data', (d) => {
     // console.log('ddata', {d})
@@ -75,13 +105,43 @@ const listenForPeer = (session, setPeers, reduce, setPhotos) => {
   })
 }
 
-const Room = () => { 
+const Room = () => {
   const [photos, setPhotos] = useState([])
   const [appState, setAppState] = useState({state: 'registering'})
   // TODO let the connection manage its own peers
   const [peers, setPeers] = useState({})
+  const [isDraggingFile, setIsDraggingFile] = useState(false)
+  const [copied, setCopied] = useState(false)
   console.log('appState', appState.state)
   console.log('peers', peers)
+
+  // Highlight the drop target while a file is dragged over the window.
+  // The canvas owns the actual `drop` handler, this is only visual feedback.
+  useEffect(() => {
+    let counter = 0
+    const hasFiles = (e) => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')
+    const onDragEnter = (e) => {
+      if (!hasFiles(e)) return
+      counter += 1
+      setIsDraggingFile(true)
+    }
+    const onDragLeave = () => {
+      counter = Math.max(0, counter - 1)
+      if (counter === 0) setIsDraggingFile(false)
+    }
+    const onDragOver = (e) => { if (hasFiles(e)) e.preventDefault() }
+    const onDrop = () => { counter = 0; setIsDraggingFile(false) }
+    window.addEventListener('dragenter', onDragEnter)
+    window.addEventListener('dragleave', onDragLeave)
+    window.addEventListener('dragover', onDragOver)
+    window.addEventListener('drop', onDrop)
+    return () => {
+      window.removeEventListener('dragenter', onDragEnter)
+      window.removeEventListener('dragleave', onDragLeave)
+      window.removeEventListener('dragover', onDragOver)
+      window.removeEventListener('drop', onDrop)
+    }
+  }, [])
 
   const reduce = sent => {
     if (sent.type === 'ROOM/ADD_PHOTO') {
@@ -179,14 +239,92 @@ const Room = () => {
     []
   )
 
+  const livePeers = countLivePeers(peers)
+  const totalPeers = Object.keys(peers).length
+  const status = humanizeState(appState.state)
+  const isHost = appState.state === 'waitingForClientConnections'
+  const inviteUrl = buildInviteUrl(appState.id)
+  const statusTone = appState.state === 'open' || (isHost && livePeers > 0)
+    ? 'live'
+    : appState.state === 'registering' || appState.state === 'connectingToHost' || appState.state === 'waitingForOpen' || appState.state === 'waitingForOpen2'
+      ? 'busy'
+      : 'idle'
+
+  const copyInvite = async () => {
+    if (!inviteUrl) return
+    try {
+      await navigator.clipboard.writeText(inviteUrl)
+    } catch (e) {
+      const ta = document.createElement('textarea')
+      ta.value = inviteUrl
+      document.body.appendChild(ta)
+      ta.select()
+      document.execCommand('copy')
+      document.body.removeChild(ta)
+    }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1800)
+  }
+
   return (
-    <div>
+    <div className="room">
+      <header className="statusbar" aria-live="polite">
+        <div className="statusbar-left">
+          <span className={`status-dot status-dot--${statusTone}`} />
+          <div className="status-text">
+            <strong className="status-label">{isHost && livePeers > 0 ? 'Live with guests' : status.label}</strong>
+            <span className="status-hint">
+              {status.hint} {totalPeers > 0 && `${livePeers}/${totalPeers} peer${totalPeers === 1 ? '' : 's'} live · `}{photos.length} photo{photos.length === 1 ? '' : 's'}
+            </span>
+          </div>
+        </div>
+        <div className="statusbar-right">
+          {appState.id && (
+            <button className="invite-btn" type="button" onClick={copyInvite} title={inviteUrl}>
+              {copied ? 'Copied!' : isHost ? 'Copy invite link' : 'Copy my room link'}
+            </button>
+          )}
+        </div>
+      </header>
+
+      {photos.length === 0 && (
+        <div className={`onboarding ${isDraggingFile ? 'onboarding--dragging' : ''}`}>
+          <div className="onboarding-card">
+            <div className="onboarding-icon" aria-hidden="true">🖼️</div>
+            <h1>{isDraggingFile ? 'Drop it — we’ll share it live' : 'Drop in a picture to share'}</h1>
+            <p>
+              This is a shared canvas. Drag&nbsp;&amp;&nbsp;drop an image anywhere on this page
+              and every connected peer sees it instantly, peer-to-peer.
+            </p>
+            <ol className="onboarding-steps">
+              <li><strong>Drop</strong> a JPG / PNG anywhere</li>
+              <li><strong>{isHost ? 'Copy the invite link above' : 'Stay connected'}</strong> {isHost ? 'and send it to a friend' : '— photos sync automatically'}</li>
+              <li><strong>Drag</strong> photos to move · <strong>Shift+click</strong> to remove · <strong>scroll</strong> to zoom</li>
+            </ol>
+            {isHost && inviteUrl && (
+              <button className="invite-btn invite-btn--large" type="button" onClick={copyInvite}>
+                {copied ? 'Invite link copied!' : 'Copy invite link'}
+              </button>
+            )}
+            {!isHost && appState.state !== 'open' && (
+              <p className="onboarding-wait">Connecting… keep this tab open until status shows Connected.</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {photos.length > 0 && (
+        <div className="mini-hint">
+          Drop more images anywhere · drag to move · Shift+click to remove · scroll to zoom
+        </div>
+      )}
+
       <Canvas peers={Object.values(peers)} photos={photos} socket={{send: sent => {
         sent = JSON.parse(sent)
         console.log({sent})
         reduce(sent)
         Object.values(peers).forEach(({ file: connection }) => {
-          if (connection.open) 
+          if (connection && connection.open)
             connection.send(sent)
         })
       }}} />
