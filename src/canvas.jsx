@@ -48,12 +48,14 @@ class Canvas extends Component {
     this.onResize();
   }
 
-  componentWillReceiveProps(props) {
-    // The redux state has changed...
-    // Load photos as Image objects and store them in the cache
-    this.loadPhotos(props);
-    // Redraw
-    this.draw(props);
+  componentDidUpdate(prevProps) {
+    // The room state has changed...
+    if (prevProps.photos !== this.props.photos || prevProps.peers !== this.props.peers) {
+      // Load photos as Image objects and store them in the cache
+      this.loadPhotos(this.props);
+      // Redraw
+      this.draw(this.props);
+    }
   }
 
   shouldComponentUpdate() {
