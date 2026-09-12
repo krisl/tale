@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "http://krisl.github.io/tale",
   "dependencies": {
-    "peerjs": "^1.0.0",
+    "peerjs": "^1.5.5",
     "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
