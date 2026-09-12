@@ -14,11 +14,6 @@
   position: fixed;
   inset: 0;
   display: block;
-  cursor: grab;
-}
-
-.room canvas:active {
-  cursor: grabbing;
 }
 
 .statusbar {
