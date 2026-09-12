@@ -2,6 +2,221 @@
   text-align: center;
 }
 
+.room {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #f4f1ea;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.room canvas {
+  position: fixed;
+  inset: 0;
+  display: block;
+  cursor: grab;
+}
+
+.room canvas:active {
+  cursor: grabbing;
+}
+
+.statusbar {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(20, 20, 22, 0.82);
+  color: #fff;
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  text-align: left;
+}
+
+.statusbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.status-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #9ca3af;
+}
+
+.status-dot--live {
+  background: #34d399;
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.25);
+}
+
+.status-dot--busy {
+  background: #fbbf24;
+  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.22);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.status-dot--idle {
+  background: #9ca3af;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.8); opacity: 0.7; }
+}
+
+.status-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.status-label {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.status-hint {
+  font-size: 12px;
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 62vw;
+}
+
+.invite-btn {
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: #fff;
+  color: #111;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.invite-btn:hover {
+  background: #e9e9e9;
+}
+
+.invite-btn--large {
+  font-size: 15px;
+  padding: 11px 18px;
+  margin-top: 6px;
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.invite-btn--large:hover {
+  background: #333;
+}
+
+.onboarding {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 76px 20px 20px;
+  pointer-events: none;
+}
+
+.onboarding-card {
+  pointer-events: none;
+  max-width: 440px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.92);
+  border: 2px dashed rgba(0, 0, 0, 0.18);
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.14);
+  text-align: center;
+}
+
+.onboarding-card .invite-btn--large {
+  pointer-events: auto;
+}
+
+.onboarding--dragging .onboarding-card {
+  border-color: #111;
+  border-style: solid;
+  background: #fff;
+  transform: scale(1.02);
+}
+
+.onboarding-icon {
+  font-size: 44px;
+}
+
+.onboarding-card h1 {
+  font-size: 24px;
+  margin: 10px 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.onboarding-card p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4b5563;
+  margin: 0 0 14px;
+}
+
+.onboarding-steps {
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.6;
+  background: #f6f4ee;
+  border-radius: 12px;
+  padding: 12px 14px 12px 32px;
+  margin: 0 0 10px;
+  color: #222;
+}
+
+.onboarding-wait {
+  font-size: 12px !important;
+  font-style: italic;
+}
+
+.mini-hint {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 6px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+@media (max-width: 560px) {
+  .status-hint {
+    white-space: normal;
+    max-width: none;
+  }
+  .statusbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
   height: 10vmin;
